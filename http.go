@@ -7,15 +7,20 @@ import (
 	"github.com/luraproject/lura/config"
 	transport "github.com/luraproject/lura/transport/http/client"
 	"go.opencensus.io/plugin/ochttp"
+	"go.opencensus.io/plugin/ochttp/propagation/tracecontext"
 	"go.opencensus.io/tag"
 	"go.opencensus.io/trace"
 )
 
 var defaultClient = &http.Client{Transport: &ochttp.Transport{}}
+var traceContextClient = &http.Client{Transport: &ochttp.Transport{Propagation: &tracecontext.HTTPFormat{}}}
 
 func NewHTTPClient(ctx context.Context) *http.Client {
 	if !IsBackendEnabled() {
 		return transport.NewHTTPClient(ctx)
+	}
+	if UseW3CTraceContext {
+		return traceContextClient
 	}
 	return defaultClient
 }
@@ -37,7 +42,15 @@ func HTTPRequestExecutorFromConfig(clientFactory transport.HTTPClientFactory, cf
 				func(r *http.Request) tag.Mutator { return tag.Upsert(ochttp.KeyClientPath, pathExtractor(r)) },
 				func(r *http.Request) tag.Mutator { return tag.Upsert(ochttp.KeyClientMethod, req.Method) },
 			}
-			client.Transport = &Transport{Base: client.Transport, tags: tags}
+			if UseW3CTraceContext {
+				client.Transport = &Transport{
+					Base:        client.Transport,
+					tags:        tags,
+					Propagation: &tracecontext.HTTPFormat{},
+				}
+			} else {
+				client.Transport = &Transport{Base: client.Transport, tags: tags}
+			}
 		}
 
 		return client.Do(req.WithContext(trace.NewContext(ctx, fromContext(ctx))))

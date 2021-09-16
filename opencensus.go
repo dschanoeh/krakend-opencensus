@@ -40,6 +40,14 @@ func Register(ctx context.Context, srvCfg config.ServiceConfig, vs ...*view.View
 			return
 		}
 
+		if cfg.UseW3CTraceContext {
+			UseW3CTraceContext = true
+		}
+
+		if cfg.TraceIdResponseHeader != "" {
+			TraceIdResponseHeader = cfg.TraceIdResponseHeader
+		}
+
 		if cfg.EnabledLayers != nil {
 			enabledLayers = *cfg.EnabledLayers
 			return
@@ -144,10 +152,12 @@ func (c composableRegister) Register(ctx context.Context, cfg Config, vs []*view
 }
 
 type Config struct {
-	SampleRate      int            `json:"sample_rate"`
-	ReportingPeriod int            `json:"reporting_period"`
-	EnabledLayers   *EnabledLayers `json:"enabled_layers"`
-	Exporters       Exporters      `json:"exporters"`
+	SampleRate            int            `json:"sample_rate"`
+	ReportingPeriod       int            `json:"reporting_period"`
+	EnabledLayers         *EnabledLayers `json:"enabled_layers"`
+	Exporters             Exporters      `json:"exporters"`
+	UseW3CTraceContext    bool           `json:"use_w3c_trace_context"`
+	TraceIdResponseHeader string         `json:"trace_id_response_header"`
 }
 
 type EndpointExtraConfig struct {
@@ -262,8 +272,10 @@ var (
 		setReportingPeriod: setReportingPeriod,
 		registerViews:      registerViews,
 	}
-	registerOnce  = new(sync.Once)
-	enabledLayers EnabledLayers
+	registerOnce          = new(sync.Once)
+	enabledLayers         EnabledLayers
+	UseW3CTraceContext    = false
+	TraceIdResponseHeader = ""
 )
 
 type EnabledLayers struct {

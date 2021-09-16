@@ -35,7 +35,9 @@ func Middleware(name string) proxy.Middleware {
 			}
 			span.AddAttributes(trace.BoolAttribute("complete", resp != nil && resp.IsComplete))
 			span.End()
-
+			if TraceIdResponseHeader != "" {
+				resp.Metadata.Headers[TraceIdResponseHeader] = []string{span.SpanContext().TraceID.String()}
+			}
 			return resp, err
 		}
 	}

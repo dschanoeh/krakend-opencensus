@@ -10,6 +10,7 @@ import (
 	krakendgin "github.com/luraproject/lura/router/gin"
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/plugin/ochttp/propagation/b3"
+	"go.opencensus.io/plugin/ochttp/propagation/tracecontext"
 	"go.opencensus.io/stats"
 	"go.opencensus.io/tag"
 	"go.opencensus.io/trace"
@@ -21,6 +22,9 @@ import (
 // New wraps a handler factory adding some simple instrumentation to the generated handlers
 func New(hf krakendgin.HandlerFactory) krakendgin.HandlerFactory {
 	return func(cfg *config.EndpointConfig, p proxy.Proxy) gin.HandlerFunc {
+		if opencensus.UseW3CTraceContext {
+			return HandlerFunc(cfg, hf(cfg, p), &tracecontext.HTTPFormat{})
+		}
 		return HandlerFunc(cfg, hf(cfg, p), nil)
 	}
 }
