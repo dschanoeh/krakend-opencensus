@@ -23,6 +23,7 @@ require (
 	github.com/kpacha/opencensus-influxdb v0.0.0-20180520162117-1b490a38de4c
 	github.com/luraproject/lura v1.4.0 // indirect
 	github.com/mattn/go-isatty v0.0.3 // indirect
+	github.com/newrelic/newrelic-opencensus-exporter-go v0.4.0 // indirect
 	github.com/openzipkin/zipkin-go v0.1.6
 	github.com/philhofer/fwd v1.0.0 // indirect
 	github.com/prometheus/client_golang v0.9.4

@@ -20,6 +20,7 @@ import (
 	"github.com/devopsfaith/krakend-opencensus/exporter"
 	_ "github.com/devopsfaith/krakend-opencensus/exporter/influxdb"
 	_ "github.com/devopsfaith/krakend-opencensus/exporter/jaeger"
+	_ "github.com/devopsfaith/krakend-opencensus/exporter/newrelic"
 	_ "github.com/devopsfaith/krakend-opencensus/exporter/prometheus"
 	_ "github.com/devopsfaith/krakend-opencensus/exporter/zipkin"
 	opencensusgin "github.com/devopsfaith/krakend-opencensus/router/gin"
